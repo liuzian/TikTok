@@ -33,11 +33,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="visible"
+                app:tabRippleColor="@color/colorPrimary"
                 app:tabMaxWidth="0dp"
                 app:tabGravity="fill"
                 app:tabIndicatorFullWidth="false"
                 app:tabIndicatorColor="@color/colorAccent"
                 app:tabMode="fixed"
+                app:tabTextAppearance="@style/TabLayoutTextSize"
                 app:tabSelectedTextColor="@android:color/white"
                 app:tabTextColor="@android:color/darker_gray" />
 
@@ -76,10 +78,12 @@
             android:background="@color/colorPrimary"
             android:visibility="invisible"
             app:tabIndicatorColor="@color/colorAccent"
+            app:tabRippleColor="@color/colorPrimary"
             app:tabMode="fixed"
             app:tabMaxWidth="0dp"
             app:tabGravity="fill"
             app:tabIndicatorFullWidth="false"
+            app:tabTextAppearance="@style/TabLayoutTextSize"
             app:tabSelectedTextColor="@android:color/white"
             app:tabTextColor="@android:color/darker_gray" />
 
