@@ -3,7 +3,9 @@ package org.kakrot.tiktok;
 import android.animation.ArgbEvaluator;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatImageView;
@@ -16,6 +18,7 @@ import com.google.android.material.tabs.TabLayout;
 import org.kakrot.tiktok.adapter.TabAdapter;
 import org.kakrot.tiktok.fragment.TabFragment;
 import org.kakrot.tiktok.model.TabItemModel;
+import org.kakrot.tiktok.util.DensityUtil;
 import org.kakrot.tiktok.widget.FullViewPager;
 import org.kakrot.tiktok.widget.ScaleScrollView;
 import org.kakrot.tiktok.widget.TitleLayout;
@@ -28,10 +31,11 @@ import java.util.List;
  */
 public class MainActivity extends AppCompatActivity implements ScaleScrollView.OnScrollChangeListener {
 
+    private String TAG = "MainActivity3";
     private TabLayout tab1, tab2;
     private TitleLayout titleLayout;
     private int colorPrimary;
-    private ArgbEvaluator evaluator;
+    private ArgbEvaluator evaluator = new ArgbEvaluator();;
     private View statusView;
 
     private int getStatusBarHeight() {
@@ -49,6 +53,12 @@ public class MainActivity extends AppCompatActivity implements ScaleScrollView.O
         setContentView(R.layout.activity_main);
         colorPrimary = ContextCompat.getColor(this, R.color.colorPrimary);
         initView();
+        findViewById(R.id.subscribe).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(MainActivity.this,"onlick 1",Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     private void initView() {
@@ -80,28 +90,37 @@ public class MainActivity extends AppCompatActivity implements ScaleScrollView.O
         tabs.add(new TabItemModel("喜欢30", TabFragment.class.getName(), null));
         return tabs;
     }
-
+    int lastScrollY = 0;
+    int h = DensityUtil.dp2px(170);
+    private int mOffset = 0;
+    private int mScrollY = 0;
     @Override
-    public void onScrollChange(NestedScrollView v, int x, int y, int ox, int oy) {
+    public void onScrollChange(NestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
         if (null != tab1 && null != tab2 && null != titleLayout && null != statusView) {
             int distance = tab1.getTop() - titleLayout.getHeight() - statusView.getHeight();
-            float ratio = v.getScaleY() * 1f / distance;
-            if (distance <= v.getScrollY()) {
+            float ratio = v.getScrollY() * 1f / distance;
+            Log.e(TAG,"onScrollChange() ratio="+ratio+"  distance="+distance+" getScrollY="+v.getScrollY());
+            if (ratio>=1) {
+           // if (v.getScrollY() >= distance) {
                 ratio = 1;
                 if (tab2.getVisibility() != View.VISIBLE) {
                     tab2.setVisibility(View.VISIBLE);
                     statusView.setBackgroundColor(colorPrimary);
+                    titleLayout.setBackgroundColor(colorPrimary);
                 }
             } else {
+                if(ratio<0.7){
+                    ratio = 0;
+                }else {
+                    ratio = (ratio - 0.7f)/0.3f;
+                }
                 if (tab2.getVisibility() == View.VISIBLE) {
                     tab2.setVisibility(View.INVISIBLE);
                     statusView.setBackgroundColor(Color.TRANSPARENT);
+                    titleLayout.setBackgroundColor(Color.TRANSPARENT);
                 }
             }
-            if (null == evaluator) {
-                evaluator = new ArgbEvaluator();
-            }
-            titleLayout.setBackgroundColor((int) evaluator.evaluate(ratio, Color.TRANSPARENT, colorPrimary));
+           // titleLayout.setBackgroundColor((int) evaluator.evaluate(ratio, Color.TRANSPARENT, colorPrimary));
             titleLayout.setTitleColor((int) evaluator.evaluate(ratio, Color.TRANSPARENT, Color.WHITE));
         }
     }
