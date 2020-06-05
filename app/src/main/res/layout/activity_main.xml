@@ -33,7 +33,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="visible"
-                app:tabGravity="center"
+                app:tabMaxWidth="0dp"
+                app:tabGravity="fill"
+                app:tabIndicatorFullWidth="false"
                 app:tabIndicatorColor="@color/colorAccent"
                 app:tabMode="fixed"
                 app:tabSelectedTextColor="@android:color/white"
@@ -73,9 +75,11 @@
             android:layout_height="wrap_content"
             android:background="@color/colorPrimary"
             android:visibility="invisible"
-            app:tabGravity="center"
             app:tabIndicatorColor="@color/colorAccent"
             app:tabMode="fixed"
+            app:tabMaxWidth="0dp"
+            app:tabGravity="fill"
+            app:tabIndicatorFullWidth="false"
             app:tabSelectedTextColor="@android:color/white"
             app:tabTextColor="@android:color/darker_gray" />
 
