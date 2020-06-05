@@ -5,6 +5,7 @@ import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +20,7 @@ import androidx.core.widget.NestedScrollView;
  * 顶部下拉图片放大回弹效果
  */
 public class ScaleScrollView extends NestedScrollView {
+    private static final String TAG = "ScaleScrollView";
     /**
      * 需要放大的View
      */
@@ -50,7 +52,7 @@ public class ScaleScrollView extends NestedScrollView {
     /**
      * 恢复原样速度
      */
-    private float mCallbackSpeed = 0.2f;
+    private float mCallbackSpeed = 0.34f;
 
     public ScaleScrollView(@NonNull Context context) {
         super(context);
@@ -100,7 +102,11 @@ public class ScaleScrollView extends NestedScrollView {
                 case MotionEvent.ACTION_UP:
                     //手指移开，放大的View恢复原样
                     isScrolling = false;
-                    callbackView();
+                    float value2 = ev.getY() - mLastPosition;
+                    Log.e(TAG,"value2="+value2);
+                    if (value2 > 0) {
+                        callbackView(value2);
+                    }
                     break;
                 case MotionEvent.ACTION_MOVE:
                     if (!isScrolling) {
@@ -127,10 +133,13 @@ public class ScaleScrollView extends NestedScrollView {
     /**
      * View恢复到最初状态动画
      */
-    private void callbackView() {
-        float value = mTargetView.getMeasuredWidth() - mTargetViewWidth;
+    private void callbackView(float value) {
+        //fix by liuzian 20200605
+        //float value = mTargetView.getMeasuredWidth() - mTargetViewWidth;
         ValueAnimator animator = ValueAnimator.ofFloat(value, 0f);
-        animator.setDuration((long) (value * mCallbackSpeed));
+        long duration = (long) (value * mCallbackSpeed);
+       // animator.setDuration(duration>200l?duration:200);
+        animator.setDuration(duration);
         animator.setInterpolator(new DecelerateInterpolator());
         animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
@@ -145,6 +154,8 @@ public class ScaleScrollView extends NestedScrollView {
      * 更新View的宽高属性值
      */
     private void updateTargetViewValue(float value) {
+        Log.e(TAG,"updateTargetViewValue()  value="+value);
+
         if (null == mTargetView) {
             return;
         }
@@ -153,8 +164,11 @@ public class ScaleScrollView extends NestedScrollView {
         }
         ViewGroup.LayoutParams lp = mTargetView.getLayoutParams();
         if (null != lp) {
-            lp.width = (int) (mTargetViewWidth + value);
-            lp.height = (int) (mTargetViewHeight * ((mTargetViewWidth + value) / mTargetViewWidth));
+            //fix by liuzian 20200605
+           // lp.width = (int) (mTargetViewWidth + value);
+            //lp.height = (int) (mTargetViewHeight * ((mTargetViewWidth + value) / mTargetViewWidth));
+            lp.width = (int) (mTargetViewWidth );
+            lp.height = (int) (mTargetViewHeight  + value/3);
             if (lp instanceof MarginLayoutParams) {
                 ((MarginLayoutParams) lp).setMargins(-(lp.width - mTargetViewWidth) / 2, 0, 0, 0);
             }
@@ -175,7 +189,9 @@ public class ScaleScrollView extends NestedScrollView {
      * 先放大后恢复动画
      */
     private void zoomAnimator() {
-        float value = mTargetViewWidth * mScaleRatio;
+        //fix by liuzian 20200605
+        //float value = mTargetViewWidth * mScaleRatio;
+        float value = mTargetViewHeight * mScaleRatio;
         ValueAnimator enlarge = ValueAnimator.ofFloat(0f, value);
         enlarge.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
